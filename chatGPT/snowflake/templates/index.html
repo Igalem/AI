@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">     <!-- , user-scalable=no"> -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://cdn.openai.com/common/fonts/soehne/soehne-buch.woff2" as="font" crossorigin="">
+    <title>Chat Interface</title>
+</head>
+<body>
+    <!-- <div id="chat-messages"></div>
+    <div class="chat-input">
+        <input type="text" id="user-message" placeholder="Send a message...">
+    </div> -->
+    
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <h1>SkaiGPT </h1> 
+        </div>
+        <div id="chat-messages" class="chat-messages"> 
+        </div> 
+        <div class="chat-input">
+            <input type="text" id="user-message" placeholder="Send a message...">
+            <button>Send</button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#user-message').keypress(function(event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                    var userMessage = $('#user-message').val();
+                    const chatSentDiv = document.getElementById("chat-messages");
+                    const paragraph = document.createElement("p");
+                    paragraph.innerHTML = '<p><strong>You:</strong> ' + userMessage + '</p>';
+                    chatSentDiv.appendChild(paragraph, 0);
+                    chatSentDiv.scrollTo(0, chatSentDiv.scrollHeight);
+                    $('#user-message').val('');                    
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/chat',
+                        data: { user_message: userMessage },
+                        success: function(data) {
+                            const chatRecivedDiv = document.getElementById("chat-messages");
+                            const paragraphRecive = document.createElement("p");
+                            paragraphRecive.className = "message received";
+                            paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + data.response ;
+                            chatRecivedDiv.appendChild(paragraphRecive, 0);
+                            const isGrpah = data.graph_path //"{{graph_path}}"
+                            if (isGrpah) {
+                                const imgRecive = document.createElement("img");
+                                imgRecive.src = isGrpah;
+                                imgRecive.className = "image";
+                                imgRecive.alt = "Graph";
+                                chatRecivedDiv.appendChild(imgRecive);
+                                
+                            }
+                            chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                        },
+                        error: function() {
+                            const chatRecivedDiv = document.getElementById("chat-messages");
+                            const paragraphRecive = document.createElement("p");
+                            paragraphRecive.className = "message received";
+                            paragraphRecive.innerHTML = '<br><strong>SkaiGPT:</strong> Something went wrong.';
+                            chatRecivedDiv.appendChild(paragraphRecive, 0);
+                            chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
