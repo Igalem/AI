@@ -3,11 +3,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* font-family: 'Roboto', sans-serif; */
     font-family: Segoe UI,Roboto, sans-serif;
-    font-variation-settings: normal;
+    font-variation-settings: normal; 
     font-size: 16px;
 }
+
+/* Default styles for all screen sizes */
+.container {
+    padding-top: 50px;
+}
+
 
 /* Body styles */
 body {
@@ -22,9 +27,9 @@ h1 {
 /* Chat container styles */
 .chat-container {
     position: relative;
-    max-width: 900px;
-    height: 700px;
-    margin: 30px auto;
+    max-width: 50rem; 
+    height: 80svh;
+    margin: auto auto;
     background-color: #f3f6fc;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -33,14 +38,16 @@ h1 {
 
 /* Chat header styles */
 .chat-header {
-    background-color: #575f6f;
+    /* background-color: #575f6f; */
+    background-color: #1f3052;
     padding: 10px;
     color: lightgray;
 }
 
 .image {
-    width: 500px; /* Set the desired width */
-    height: 400px; /* Set the desired height */
+    width: max-content; /* Set the desired width */
+    height: 350px; /* Set the desired height */
+    padding-bottom: 20px;
 }
 
 
@@ -48,7 +55,7 @@ h1 {
 .chat-messages {
     padding: 20px;
     overflow-y: auto;
-    max-height: 500px;
+    max-height: 60svh;
 }
 
 .message {
@@ -88,7 +95,7 @@ h1 {
 
 ::placeholder {
     color: rgb(172, 171, 171);
-  }
+}
 
 .chat-input input[type="text"] {
     flex: 1;
@@ -96,13 +103,21 @@ h1 {
     padding: 10px;
     border-radius: 13px;
     border: 1px solid #ddd;
-    /* font-size: medium; */
+}
+
+input:focus[type="text"] {
+    color: rgb(76, 6, 76);
+    outline-color: #ddd;
+    outline-width: 0px;
+    border-radius: 13px;
+    /* Additional styles for outline appearance */
+    outline-style: solid;
 }
 
 .chat-input button {
     margin-left: 10px;
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: rgb(145, 45, 145);
     color: #fff;
     border: none;
     border-radius: 3px;

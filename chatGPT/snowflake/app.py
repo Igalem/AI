@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import snowflake.connector
-import matplotlib
-matplotlib.use('Agg')  # Use the Agg backend
+import matplotlib as mpl
+mpl.use('Agg')  # Use the Agg backend
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import pandas as pd
@@ -21,6 +21,7 @@ SNF_PWD = config.SNF_PWD
 SNF_ACCOUNT = config.SNF_ACCOUNT
 SNF_REGION = config.SNF_REGION
 SNF_DATABASE = config.SNF_DATABASE
+SNF_SCHEMA = config.SNF_SCHEMA
 
 
 def convert_to_query(query):
@@ -104,11 +105,15 @@ def create_plot(data):
     # plt.ylabel('Total Spend')
     x = columns[0]
     y = columns[1]
-    plt.plot(df[x], df[y],marker='o')
+    plt.style.use('https://github.com/dhaitz/matplotlib-stylesheets/raw/master/pitayasmoothie-light.mplstyle')
+    mpl.rcParams['font.size'] = 10
+
+    plt.plot(df[x], df[y], linewidth=2.0, color='#571270', marker='o')
     plt.ticklabel_format(style='plain', axis='y')
     plt.xlabel(x)
     plt.ylabel(y)
-    
+    # plt.tight_layout()
+    plt.legend()
     plt.title(x)
 
     graph_path = 'static/graph1.png'
@@ -120,7 +125,7 @@ def create_plot(data):
 # Route for the home page
 @app.route('/')
 def home():
-    
+
     
     # graph_path=create_plot(data=data)
     graph_path=''
@@ -136,9 +141,13 @@ def chat():
     sqlQuery = generate_response(prompt)
     print(f"========>>> {sqlQuery}")
     response = exec_query(sqlQuery)
-    results = results = results_to_string(results=response)
-    # if 'select' in sqlQuery.lower():
-    graph_path=create_plot(data=response)
+    
+    # validate AI response for query or language
+    if 'select' in sqlQuery.lower():
+        results = results_to_string(results=response)
+        graph_path=create_plot(data=response)
+    else:
+        results = response
     return {'response': results, 'graph_path' : graph_path}
 
 if __name__ == '__main__':

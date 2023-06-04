@@ -2,30 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">     <!-- , user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">     -->
     <link rel="stylesheet" href="/static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="preload" href="https://cdn.openai.com/common/fonts/soehne/soehne-buch.woff2" as="font" crossorigin="">
     <title>Chat Interface</title>
 </head>
 <body>
-    <!-- <div id="chat-messages"></div>
-    <div class="chat-input">
-        <input type="text" id="user-message" placeholder="Send a message...">
-    </div> -->
-    
-    <div id="chat-container" class="chat-container">
-        <div class="chat-header">
-            <h1>SkaiGPT </h1> 
-        </div>
-        <div id="chat-messages" class="chat-messages"> 
-        </div> 
+    <div class="container">
+        <div class="row">
+            <!-- <div class="py-5 mx-auto col-8"> -->
+                <!-- <div id="chat-container" class="chat-container"></div> -->
+        <!-- <div id="chat-messages"></div>
         <div class="chat-input">
             <input type="text" id="user-message" placeholder="Send a message...">
-            <button>Send</button>
+        </div> -->
+        <div id="chat-container" class="chat-container">
+            <div class="chat-header">
+                <h1>SkaiGPT </h1> 
+            </div>
+            <div id="chat-messages" class="chat-messages"> 
+            </div> 
+            <div class="chat-input">
+                <input type="text" id="user-message" placeholder="Send a message...">
+                <button>Send</button>
+            </div>
         </div>
+        </div>
+        <!-- </div> -->
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#user-message').keypress(function(event) {
@@ -49,14 +56,15 @@
                             paragraphRecive.className = "message received";
                             paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + data.response ;
                             chatRecivedDiv.appendChild(paragraphRecive, 0);
-                            const isGrpah = data.graph_path //"{{graph_path}}"
-                            if (isGrpah) {
+                            const imageUrl = data.graph_path //"{{graph_path}}"
+                            if (imageUrl) {
                                 const imgRecive = document.createElement("img");
-                                imgRecive.src = isGrpah;
+                                imgRecive.id = "plotImage"
+                                // imgRecive.src = imageUrl;
+                                imgRecive.src = imageUrl + '?t=' + new Date().getTime();
                                 imgRecive.className = "image";
-                                imgRecive.alt = "Graph";
+                                imgRecive.alt = "plotGraph";
                                 chatRecivedDiv.appendChild(imgRecive);
-                                
                             }
                             chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
                         },
