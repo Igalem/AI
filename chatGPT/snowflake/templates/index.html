@@ -11,6 +11,14 @@
 <body>
     <div class="container">
         <div class="row">
+            <table>
+                <tr>
+                    {% for res in response %}
+                    <td>{{ res }}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+            
             <!-- <div class="py-5 mx-auto col-8"> -->
                 <!-- <div id="chat-container" class="chat-container"></div> -->
         <!-- <div id="chat-messages"></div>
@@ -51,12 +59,52 @@
                         url: '/chat',
                         data: { user_message: userMessage },
                         success: function(data) {
+                            // console.log(data);
                             const chatRecivedDiv = document.getElementById("chat-messages");
+
+                            const response = data.response;
+                            console.log("=========response=================");
+                            console.log(response);
+
+                            // -----------------------------------------------
                             const paragraphRecive = document.createElement("p");
                             paragraphRecive.className = "message received";
-                            paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + data.response ;
+                            // paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + data.response ; 
+                            paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + 'Sure! here is the results for ' + userMessage
                             chatRecivedDiv.appendChild(paragraphRecive, 0);
                             const imageUrl = data.graph_path //"{{graph_path}}"
+                            // --- table creation -----------------------------                          
+                            // Create the table element
+                            const table = document.createElement("table");
+                            // Create the table header row
+                            const headerRow = document.createElement("tr");
+                            headerRow.className = "table__header";
+                            const headers = response[0];
+                            for (let header of headers) {
+                            const th = document.createElement("th");
+                            th.textContent = header;
+                            th.className = "table__cell";
+                            headerRow.appendChild(th);
+                            }
+                            table.appendChild(headerRow);
+
+                            // Create the table data rows
+                            for (let i = 1; i < response.length; i++) {
+                            const dataRow = document.createElement("tr");
+                            dataRow.className = "table__row";
+                            const rowData = response[i];
+                            for (let data of rowData) {
+                                const td = document.createElement("td");
+                                td.textContent = data;
+                                td.className = "table__cell";
+                                dataRow.appendChild(td);
+                            }
+                            table.appendChild(dataRow);
+                            }
+
+                            // Attach the table to the chatRecivedDiv
+                            chatRecivedDiv.appendChild(table);
+                            
                             if (imageUrl) {
                                 const imgRecive = document.createElement("img");
                                 imgRecive.id = "plotImage"
@@ -67,6 +115,10 @@
                                 chatRecivedDiv.appendChild(imgRecive);
                             }
                             chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                            // -----------------------------------------------                            
+
+
+
                         },
                         error: function() {
                             const chatRecivedDiv = document.getElementById("chat-messages");
