@@ -2,12 +2,11 @@ from flask import Flask, render_template, request
 import snowflake.connector
 import matplotlib as mpl
 mpl.use('Agg')  # Use the Agg backend
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import pandas as pd
 import openai
 import config
 import string
+from plotter import create_plot
+
 
 app = Flask(__name__)
 
@@ -15,6 +14,7 @@ app = Flask(__name__)
 openai.api_key = config.OPENAI_KEY
 CHAT_MODEL = config.CHAT_MODEL
 DEFAULT_PROMPT = config.DEFAULT_PROMPT
+GRAPH_PROMPT = config.GRAPH_PROMPT
 MESSAGES = config.MESSAGES
 SNF_USER = config.SNF_USER
 SNF_PWD = config.SNF_PWD
@@ -23,6 +23,10 @@ SNF_REGION = config.SNF_REGION
 SNF_DATABASE = config.SNF_DATABASE
 SNF_SCHEMA = config.SNF_SCHEMA
 
+
+def convert_list_to_string(lst):
+    result = '[' + ', '.join([str(tuple(item)) for item in lst]) + ']'
+    return result
 
 def convert_to_query(query):
     if '```' in query:
@@ -40,8 +44,9 @@ def generate_response(prompt):
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
-        stop=["#", ";"],
-        messages=MESSAGES + [{"role": "user", "content": prompt}],
+        # stop=["#"],
+        # messages=MESSAGES + [{"role": "user", "content": prompt}],
+        messages=prompt,
         )
 
     response = completion.choices[0].message.content
@@ -92,36 +97,6 @@ def results_to_string(results):
         return 'No results found.'
     
 
-def create_plot(data):
-    # Convert data into DataFrame
-    columns = list(data[0])
-    df = pd.DataFrame(data[1:], columns=data[0])
-
-    bar_colors = ['#575f6f']
-    # Create bar plot
-    # plt.plot(df['Month'], df['Total Spend'], color=bar_colors)
-    # plt.plot(df['Month'], df['Total Spend'])
-    # plt.xlabel('Month')
-    # plt.ylabel('Total Spend')
-    x = columns[0]
-    y = columns[1]
-    plt.style.use('https://github.com/dhaitz/matplotlib-stylesheets/raw/master/pitayasmoothie-light.mplstyle')
-    mpl.rcParams['font.size'] = 10
-
-    plt.plot(df[x], df[y], linewidth=2.0, color='#571270', marker='o')
-    plt.ticklabel_format(style='plain', axis='y')
-    plt.xlabel(x)
-    plt.ylabel(y)
-    # plt.tight_layout()
-    plt.legend()
-    plt.title(x)
-
-    graph_path = 'static/graph1.png'
-    plt.savefig(graph_path)
-    plt.close() 
-    return graph_path
-
-
 # Route for the home page
 @app.route('/')
 def home():
@@ -129,26 +104,33 @@ def home():
     
     # graph_path=create_plot(data=data)
     graph_path=''
+    response = 'Igal Emona'
 
-    return render_template('index.html', graph_path=graph_path)
+    return render_template('index.html', response=response, graph_path=graph_path)
 
 # Route for chat interactions
 @app.route('/chat', methods=['POST'])
 def chat():
     graph_path=''
     user_message = request.form['user_message']
-    prompt = f'User: {user_message}\nChatGPT: '    
+    prompt_formatted = f'User: {user_message}\nChatGPT: '    
+    prompt = MESSAGES + [{"role": "user", "content": prompt_formatted}]
     sqlQuery = generate_response(prompt)
     print(f"========>>> {sqlQuery}")
-    response = exec_query(sqlQuery)
+    results = exec_query(sqlQuery)
     
     # validate AI response for query or language
     if 'select' in sqlQuery.lower():
-        results = results_to_string(results=response)
-        graph_path=create_plot(data=response)
+        response = results ###results_to_string(results=results)
+
+        ## plotting the graphs for the user
+        # graph_path=create_plot(data=response)
+
     else:
-        results = response
-    return {'response': results, 'graph_path' : graph_path}
+        response = results
+    return {'response': response, 'graph_path' : graph_path}
+
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
