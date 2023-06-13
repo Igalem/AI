@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Set up OpenAI API credentials and instructions
 openai.api_key = config.OPENAI_KEY
 CHAT_MODEL = config.CHAT_MODEL
-DEFAULT_PROMPT = config.DEFAULT_PROMPT
+DEFAULT_PROMPT = config.DEFAULT_PROMPT_MARKETING
 GRAPH_PROMPT = config.GRAPH_PROMPT
 MESSAGES = config.MESSAGES
 SNF_USER = config.SNF_USER
@@ -80,7 +80,7 @@ def exec_query(query):
         response.append(tuple(columns))
         data = cursor.fetchall()
         response = response + data
-        print(f"********************** {response}")
+        # print(f"********************** {response}")
         return response
     else:
         return query
@@ -100,36 +100,35 @@ def results_to_string(results):
 # Route for the home page
 @app.route('/')
 def home():
-
-    
-    # graph_path=create_plot(data=data)
     graph_path=''
-    response = 'Igal Emona'
-
+    response = ''
     return render_template('index.html', response=response, graph_path=graph_path)
 
+
 # Route for chat interactions
-@app.route('/chat', methods=['POST'])
+@app.route('/chat',  methods=["POST"])
 def chat():
+    dropdown_selected = ruser_message = request.form['drop_down']
+    if dropdown_selected == "Marketing":
+        DEFAULT_PROMPT = config.DEFAULT_PROMPT_MARKETING
+    else:
+        DEFAULT_PROMPT = config.DEFAULT_PROMPT_JIRA
+    
     graph_path=''
     user_message = request.form['user_message']
-    prompt_formatted = f'User: {user_message}\nChatGPT: '    
-    prompt = MESSAGES + [{"role": "user", "content": prompt_formatted}]
+    prompt_formatted = f'User: {user_message}\nChatGPT: '   
+    entity = [{"role": "system", "content": DEFAULT_PROMPT}]
+    prompt = MESSAGES + entity + [{"role": "user", "content": prompt_formatted}]
     sqlQuery = generate_response(prompt)
-    print(f"========>>> {sqlQuery}")
-    results = exec_query(sqlQuery)
+    # print(f"========>>> {sqlQuery}")
+    response = exec_query(sqlQuery)
     
     # validate AI response for query or language
     if 'select' in sqlQuery.lower():
-        response = results ###results_to_string(results=results)
-
-        ## plotting the graphs for the user
-        # graph_path=create_plot(data=response)
-
+        isQuery = True
     else:
-        response = results
-    return {'response': response, 'graph_path' : graph_path}
-
+        isQuery = False
+    return {'response': response, 'graph_path' : graph_path, 'isQuery': isQuery}
 
 
 if __name__ == '__main__':

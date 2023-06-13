@@ -3,50 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">     -->
     <link rel="stylesheet" href="/static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <title>Chat Interface</title>
 </head>
 <body>
     <div class="container">
         <div class="row">
-            <table>
-                <tr>
-                    {% for res in response %}
-                    <td>{{ res }}</td>
-                    {% endfor %}
-                </tr>
-            </table>
-            
+            <!-- <div id="chart"></div> -->
             <!-- <div class="py-5 mx-auto col-8"> -->
                 <!-- <div id="chat-container" class="chat-container"></div> -->
         <!-- <div id="chat-messages"></div>
         <div class="chat-input">
             <input type="text" id="user-message" placeholder="Send a message...">
         </div> -->
+
+        
+        <!-- // ------------------------------ -->
         <div id="chat-container" class="chat-container">
             <div class="chat-header">
-                <h1>SkaiGPT </h1> 
+                <div class="header-content">
+                    <h1>SkaiGPT</h1>
+                    <select id="myDropdown" onchange="toggleDropdown()">
+                        <option value="Marketing">Marketing</option>
+                        <option value="Jira">Jira Issues</option>
+                    </select>
+                </div>
             </div>
             <div id="chat-messages" class="chat-messages"> 
             </div> 
             <div class="chat-input">
                 <input type="text" id="user-message" placeholder="Send a message...">
-                <button>Send</button>
+                <button val="0" id="myButton" class="myButtonDisabled" onclick="toggleButton()">Make your magic</button>
             </div>
         </div>
+        
+        <div class="button-menu">
+            <ul class="button-list">
+            </ul>
+            <ul class="button-list">
+            </ul>
+        </div> <!-- Button-menu-->
+
         </div>
-        <!-- </div> -->
     </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        window.onload = function() {
+            var myMagic = document.getElementById("myButton");
+            myMagic.val = 0;
+            var myDropdown = document.getElementById("myDropdown");
+            myDropdown.val = "Marketing";
+
+            var buttonNames = ["Product", "Campaign ID", "Campaign Name", "Campaign Category", "Currency", "KS", "Spend", "Clicks"];
+            var buttonNames2 = ["Country", "Year", "Month"];
+
+            function generateButtons(buttonArray, listId) {
+                var buttonList = document.createElement("ul");
+                buttonList.id = listId;
+                buttonList.className = "button-list";
+
+                for (var i = 0; i < buttonArray.length; i++) {
+                    var button = document.createElement("button");
+                    button.className = "buttonMenu";
+                    button.innerHTML = buttonArray[i];
+
+                    var listItem = document.createElement("li");
+                    listItem.appendChild(button);
+                    buttonList.appendChild(listItem);
+                }
+
+                return buttonList;
+            }
+
+            document.querySelector(".button-menu").appendChild(generateButtons(buttonNames, "button-list"));
+            document.querySelector(".button-menu").appendChild(generateButtons(buttonNames2, "button-list2"));
+        };
+        
+        function toggleButton() {
+            var myMagic = document.getElementById("myButton");
+            if (myMagic.val == '1') {
+                myMagic.val = '0';
+                myMagic.className = "myButtonDisabled"
+            } else {
+                myMagic.val = '1';
+                myMagic.className = "myButtonEnabled"
+            };
+
+        }
+        
         $(document).ready(function() {
             $('#user-message').keypress(function(event) {
                 if (event.which === 13) {
                     event.preventDefault();
+                    var userInput = document.getElementById("user-message");
+                    userInput.disabled = true;
                     var userMessage = $('#user-message').val();
+                    var myDropdown = $("#myDropdown").val();
+                    var myMagic = document.getElementById("myButton");
                     const chatSentDiv = document.getElementById("chat-messages");
                     const paragraph = document.createElement("p");
                     paragraph.innerHTML = '<p><strong>You:</strong> ' + userMessage + '</p>';
@@ -57,69 +114,72 @@
                     $.ajax({
                         type: 'POST',
                         url: '/chat',
-                        data: { user_message: userMessage },
+                        data: { user_message: userMessage, drop_down: myDropdown},
                         success: function(data) {
-                            // console.log(data);
                             const chatRecivedDiv = document.getElementById("chat-messages");
-
+                            const isQuery = data.isQuery;
                             const response = data.response;
-                            console.log("=========response=================");
-                            console.log(response);
-
                             // -----------------------------------------------
                             const paragraphRecive = document.createElement("p");
                             paragraphRecive.className = "message received";
-                            // paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + data.response ; 
-                            paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + 'Sure! here is the results for ' + userMessage
-                            chatRecivedDiv.appendChild(paragraphRecive, 0);
-                            const imageUrl = data.graph_path //"{{graph_path}}"
-                            // --- table creation -----------------------------                          
-                            // Create the table element
-                            const table = document.createElement("table");
-                            // Create the table header row
-                            const headerRow = document.createElement("tr");
-                            headerRow.className = "table__header";
-                            const headers = response[0];
-                            for (let header of headers) {
-                            const th = document.createElement("th");
-                            th.textContent = header;
-                            th.className = "table__cell";
-                            headerRow.appendChild(th);
-                            }
-                            table.appendChild(headerRow);
-
-                            // Create the table data rows
-                            for (let i = 1; i < response.length; i++) {
-                            const dataRow = document.createElement("tr");
-                            dataRow.className = "table__row";
-                            const rowData = response[i];
-                            for (let data of rowData) {
-                                const td = document.createElement("td");
-                                td.textContent = data;
-                                td.className = "table__cell";
-                                dataRow.appendChild(td);
-                            }
-                            table.appendChild(dataRow);
-                            }
-
-                            // Attach the table to the chatRecivedDiv
-                            chatRecivedDiv.appendChild(table);
                             
-                            if (imageUrl) {
-                                const imgRecive = document.createElement("img");
-                                imgRecive.id = "plotImage"
-                                // imgRecive.src = imageUrl;
-                                imgRecive.src = imageUrl + '?t=' + new Date().getTime();
-                                imgRecive.className = "image";
-                                imgRecive.alt = "plotGraph";
-                                chatRecivedDiv.appendChild(imgRecive);
-                            }
-                            chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
-                            // -----------------------------------------------                            
+                            if (isQuery) {
+                                paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + 'Sure! here is the results for ' + userMessage
+                                chatRecivedDiv.appendChild(paragraphRecive, 0);
+                                
+                                // --- table creation -----------------------------                          
+                                // Create the table element
+                                const table = document.createElement("table");
+                                // Create the table header row
+                                const headerRow = document.createElement("tr");
+                                headerRow.className = "table__header";
+                                const headers = response[0];
+                                for (let header of headers) {
+                                const th = document.createElement("th");
+                                th.textContent = header;
+                                th.className = "table__cell";
+                                headerRow.appendChild(th);
+                                }
+                                table.appendChild(headerRow);
 
+                                // Create the table data rows
+                                for (let i = 1; i < response.length; i++) {
+                                const dataRow = document.createElement("tr");
+                                dataRow.className = "table__row";
+                                const rowData = response[i];
+                                for (let data of rowData) {
+                                    const td = document.createElement("td");
+                                    td.textContent = data;
+                                    td.className = "table__cell";
+                                    dataRow.appendChild(td);
+                                }
+                                table.appendChild(dataRow);
+                                }
 
+                                // Attach the table to the chatRecivedDiv
+                                chatRecivedDiv.appendChild(table);
+                                
+                                if (myMagic.val == '1') {
+                                    /// ---- generating GRAPH.JS    
+                                    var genCanvas = document.createElement("canvas");
+                                    createGraph(response, genCanvas);
+                                    chatRecivedDiv.appendChild(genCanvas, 0); 
+                                    chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                                }
+                                // -----------------------------------------------
+                                chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                                // userInput.disabled = false;
+                                // -----------------------------------------------                            
+                            } 
+                            else {
+                                    paragraphRecive.innerHTML = '<strong>SkaiGPT:</strong> ' + response;
+                                    chatRecivedDiv.appendChild(paragraphRecive, 0);
+                                    chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                                } // end of if isQuery
+                            userInput.disabled = false;
 
-                        },
+                        }
+                        ,
                         error: function() {
                             const chatRecivedDiv = document.getElementById("chat-messages");
                             const paragraphRecive = document.createElement("p");
@@ -130,8 +190,43 @@
                         }
                     });
                 }
-            });
-        });
+             }); 
+        }) ;
+
+        function updateListItems(newItems, id) {
+            var buttonList = document.getElementById(id);
+            buttonList.innerHTML = ""; // Clear existing list items
+            
+            newItems.forEach(function(item) {
+                var button = document.createElement("button");
+                button.className = "buttonMenu";
+                button.textContent = item;
+
+                var listItem = document.createElement("li");
+                listItem.appendChild(button);
+                buttonList.appendChild(listItem);
+                });
+            }
+        
+        function toggleDropdown() {
+            var myDropdown = document.getElementById("myDropdown");
+            
+            if (myDropdown.val == 'Marketing') {
+                myDropdown.val = 'Jira';
+                myDropdown.value = 'Jira';
+                var newItems = ["Issue", "Created", "Updated", "Year", "Month", "Title", "Issue Type", "Status", "Project", "Team Name"];
+                var newItems2 = ["Creator", "Assignee", "Environment", "Total Sprints", "Time Tracking", "Progress"];            
+            } 
+            else {
+                myDropdown.val = 'Marketing';
+                myDropdown.value = 'Marketing';
+                var newItems = ["Product", "Campaign ID", "Campaign Name", "Campaign Category", "KS", "Spend", "Clicks"];
+                var newItems2 = ["Country", "Year", "Month"];
+            };
+            updateListItems(newItems, "button-list");
+            updateListItems(newItems2, "button-list2");
+    }
     </script>
+    <script src="{{ url_for('static', filename='ploting.js') }}"></script>
 </body>
 </html>
