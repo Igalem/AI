@@ -187,6 +187,7 @@
                             paragraphRecive.innerHTML = '<br><strong>SkaiGPT:</strong> Something went wrong.';
                             chatRecivedDiv.appendChild(paragraphRecive, 0);
                             chatRecivedDiv.scrollTo(0, chatRecivedDiv.scrollHeight);
+                            userInput.disabled = false;
                         }
                     });
                 }
