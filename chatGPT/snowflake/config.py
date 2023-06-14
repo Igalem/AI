@@ -5,15 +5,50 @@ class Config(object):
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 
-CHAT_MODEL="gpt-3.5-turbo"
+CHAT_MODEL = "gpt-3.5-turbo"
 
-DEFAULT_PROMPT = '''
+DEFAULT_PROMPT_MARKETING = '''
 ### Snowflake SQL tables, with their properties:
-#BI_DWH_PROD.DM_HACKATON_V(KSNAME string,COUNTRY string,PRODUCT string,CAMPAIGN_ID number,CAMPAIGN_NAME string,SPEND,DATE_YEAR number,DATE_MONTH number)
+#create TABLE BI_DWH_PROD.DM_HACKATON_V(
+KS string,
+COUNTRY string,
+PRODUCT string,
+CAMPAIGN_ID number,
+CAMPAIGN_NAME string,
+CAMPAIGN_CATEGORY string,
+SPEND number,
+CLICKS number,
+YEAR number,
+MONTH number)
 #PRODUCT value examples:
 Albertsons,Amazon,AmazonDSP,AmazonDSPReporting,Apple,Apple (Adquant),Baidu,CitrusAd,CityGrid,Criteo,Display, Drizly, FB, Facebook, Facebook (Adquant), GoPuff, Google, #Google (Adquant), HyVee, Instacart, Kroger, LinkedIn, Lowes, MSN, Nectar360, Petco, Pinterest, Reddit, #SamsClub, Snapchat, Snapchat (Adquant), Social2, Target, TheTradeDesk, Tiktok, Twitter, UNIVERSAL, #Unknown, Walmart, Yahoo, YahooGemini, YahooJapan, Yandex, YouTube
-#DATE_MONTH values: 1,2,3,4,5,6,7,8,9,10,11,12
-# Use format to TO_CHAR(DATE, '999,999,999,999') for the aggregationed fields in the SELECT clause liks SUM
+#MONTH values: between 1 to 12
+#YEAR values: between 1900 to 2023
+# add alias to the fields query
+# Content will return as the SQL clause query ONLY!
+'''
+
+DEFAULT_PROMPT_JIRA = '''
+### Snowflake SQL tables, with their properties:
+#create TABLE BI_DWH_PROD.JI_HACKATON_V (
+ISSUE VARCHAR(16777216),
+CREATED TIMESTAMP_NTZ(9),
+UPDATED TIMESTAMP_NTZ(9),
+YEAR NUMBER,
+MONTH NUMBER,
+TITLE VARCHAR(16777216),
+ISSUE_TYPE VARCHAR(16777216),
+STATUS VARCHAR(16777216),
+PROJECT VARCHAR(16777216),
+TEAM VARCHAR(16777216),
+CREATOR VARCHAR(16777216),
+ASSIGNEE VARCHAR(16777216),
+ENVIRONMENT VARCHAR(16777216),
+TOTAL_SPRINTS NUMBER,
+TIMETRACKING NUMBER,
+PROGRESS NUMBER) 
+#MONTH values: between 1 to 12
+#YEAR values: between 1900 to 2023
 # add alias to the fields query
 # Content will return as the SQL clause query ONLY!
 '''
@@ -35,9 +70,8 @@ GRAPH_PROMPT = "Act as an expert python developer and use matplotlib to genereat
 
 MESSAGES = [
     # {"role": "system", "content": "Act as SQL developer expert."},
-     {"role": "system", "content": "Act as an Senior Data Analyst expert."},
-    {"role": "system", "content": DEFAULT_PROMPT},
-    # {"role": "assistant", "content": "{\"recipient\": \"USER\", \"message\":\"I understand.\"}."},
+    {"role": "system", "content": "Act as an Senior Data Analyst expert."},
+    # {"role": "system", "content": DEFAULT_PROMPT_JIRA},
     ]
 
 SNF_USER = os.getenv('SNF_USER')
