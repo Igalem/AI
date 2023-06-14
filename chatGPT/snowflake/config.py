@@ -5,7 +5,7 @@ class Config(object):
 
 OPENAI_KEY = os.getenv('OPENAI_KEY')
 
-CHAT_MODEL="gpt-3.5-turbo"
+CHAT_MODEL = "gpt-3.5-turbo"
 
 DEFAULT_PROMPT_MARKETING = '''
 ### Snowflake SQL tables, with their properties:
