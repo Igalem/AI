@@ -32,7 +32,7 @@ AI_ROLE_INS2 = "role is considered as Executive? response only 'True' or 'False'
 CHAT_MODEL = "gpt-3.5-turbo-16k"   ##gpt-3.5-turbo"
 CHAT_MODEL_EXEC = "gpt-3.5-turbo"
 openai.api_key = os.getenv('OPENAI_KEY')
-X_API_KEY = os.getenv('X-API-KEY')
+X_API_KEY = os.getenv('X_API_KEY')
 
 
 def serper(full_name, company, selected_region):
