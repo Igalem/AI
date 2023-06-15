@@ -33,7 +33,6 @@ def convert_to_query(query):
         sqlQuery = f"{query.split('```')[1]};"
     else:
         sqlQuery = f"SELECT {query.split('SELECT')[1].split(';')[0]};"
-
     return sqlQuery
 
 def generate_response(prompt):
@@ -67,6 +66,7 @@ def snowflake_connector(user, password, account, region, database, schema):
 
 def exec_query(query):
     if 'select' in query.lower():
+        print(f"----------------------- {query}")
         query = convert_to_query(query)
         snfClient = snowflake_connector(user=SNF_USER,
                         password = SNF_PWD,
