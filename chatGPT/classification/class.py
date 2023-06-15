@@ -90,10 +90,10 @@ def is_executer(role):
 def main():
     # logo_src = "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-ios7-contact-512.png"
 
-    logo_col1, logo_col2 = st.columns([2,6])
+    logo_col1, logo_col2 = st.columns([3,5])
     with logo_col1:
-        image_path = "static/logo.gif"
-        st.image(image_path, width=150)
+        image_path = "static/logo2.png"
+        st.image(image_path, width=250)
     with logo_col2:
         st.markdown(f"<h2 style='display: flex; align-items: center; font-size:50px; color: #009496;'>Executive or Not ? </h2>", unsafe_allow_html=True)
         st.write("Executive Classification application based on AI")
