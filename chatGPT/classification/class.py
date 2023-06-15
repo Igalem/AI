@@ -92,7 +92,7 @@ def main():
 
     logo_col1, logo_col2 = st.columns([3,5])
     with logo_col1:
-        image_path = "static/logo2.png"
+        image_path = "static/logo2.gif"
         st.image(image_path, width=250)
     with logo_col2:
         st.markdown(f"<h2 style='display: flex; align-items: center; font-size:50px; color: #009496;'>Executive or Not ? </h2>", unsafe_allow_html=True)
